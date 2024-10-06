@@ -44,7 +44,7 @@ function Post() {
             commentBody: newComment,
             username: response.data.username,
           };
-          setComments([...comments, commentToAdd]);
+          setComments([...comments, response.data]);
           setNewComment("");
         }
       });
