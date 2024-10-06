@@ -13,6 +13,7 @@ router.post("/", async (req, res) => {
     Users.create({
       username: username,
       password: hash,
+      admin: 0, // Explicitly setting admin to false for new users
     });
     res.json("Success");
   });
@@ -29,10 +30,15 @@ router.post("/login", async (req, res) => {
       return res.json({ error: "Wrong username and password combination" });
 
     const accessToken = sign(
-      { username: user.username, id: user.id },
+      { username: user.username, id: user.id, admin: user.admin },
       "importantsecret"
     );
-    return res.json({ token: accessToken, username: username, id: user.id });
+    return res.json({
+      token: accessToken,
+      username: username,
+      id: user.id,
+      admin: user.admin,
+    });
   });
 });
 
