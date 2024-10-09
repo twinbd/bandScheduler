@@ -10,5 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  // Musicians.associate = (models) => {
+  //   Musicians.belongsTo(models.Songs, {
+  //     foreignKey: "SongId",
+  //   });
+  // };
+
   return Musicians;
 };

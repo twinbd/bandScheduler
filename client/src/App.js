@@ -116,7 +116,7 @@ function MainContent({ authState, setAuthState }) {
         <Route path="/changepassword" element={<ChangePassword />} />
         <Route path="/events" element={<Events />} />
         <Route path="/songs/:eventId" element={<Songs />} />
-        <Route path="/musicians/:songsId" element={<Musicians />} />
+        <Route path="/musicians/:songId" element={<Musicians />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
