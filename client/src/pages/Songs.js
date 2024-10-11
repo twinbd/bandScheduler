@@ -2,13 +2,12 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../helpers/AuthContext";
+import * as Yup from "yup";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 
 function Songs() {
   let { eventId } = useParams();
   const [songs, setSongs] = useState([]);
-  const [title, setTitle] = useState("");
-  const [artist, setArtist] = useState("");
-  const [link, setLink] = useState("");
   const { authState } = useContext(AuthContext);
   let navigate = useNavigate();
 
@@ -33,14 +32,23 @@ function Songs() {
       });
   };
 
-  const addSong = () => {
+  // Validation schema with Yup for the songs form
+  const songSchema = Yup.object().shape({
+    title: Yup.string().required("Title is required"),
+    artist: Yup.string().required("Artist is required"),
+    link: Yup.string().required("Link is required"),
+    // Use this line of code for actual production
+    // link: Yup.string().url("Invalid URL").required("Link is required"),
+  });
+
+  const onSubmit = (data, { resetForm }) => {
     axios
       .post(
         "http://localhost:3001/songs",
         {
-          title: title,
-          artist: artist,
-          link: link,
+          title: data.title,
+          artist: data.artist,
+          link: data.link,
           EventId: eventId,
         },
         {
@@ -54,40 +62,41 @@ function Songs() {
           alert(response.data.error);
         } else {
           setSongs([...songs, response.data]); // Add new song to the list
-          setTitle("");
-          setArtist("");
-          setLink("");
+          resetForm(); // Reset form after submission
         }
       });
   };
 
   return (
     <div>
-      <button onClick={() => deleteEvent(eventId)}> Delete this event</button>
-      <div>
-        <input
-          type="text"
-          placeholder="Title..."
-          autoComplete="off"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Artist..."
-          autoComplete="off"
-          value={artist}
-          onChange={(event) => setArtist(event.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Link..."
-          autoComplete="off"
-          value={link}
-          onChange={(event) => setLink(event.target.value)}
-        />
-        <button onClick={addSong}> Add Song</button>
-      </div>
+      <button onClick={() => navigate(`/events`)}>Back to Events</button>
+      <button onClick={deleteEvent}>Delete this event</button>
+
+      <h1>Add New Song</h1>
+      <Formik
+        initialValues={{ title: "", artist: "", link: "" }} // Initial values
+        onSubmit={onSubmit} // Form submission handler
+        validationSchema={songSchema} // Attach validation schema
+      >
+        <Form className="formContainer">
+          {/* Title input field */}
+          <label>Title: </label>
+          <ErrorMessage name="title" component="span" className="error" />{" "}
+          {/* Error message */}
+          <Field name="title" placeholder="Song Title" className="inputField" />
+          {/* Artist input field */}
+          <label>Artist: </label>
+          <ErrorMessage name="artist" component="span" className="error" />{" "}
+          {/* Error message */}
+          <Field name="artist" placeholder="Artist" className="inputField" />
+          {/* Link input field */}
+          <label>Link: </label>
+          <ErrorMessage name="link" component="span" className="error" />{" "}
+          {/* Error message */}
+          <Field name="link" placeholder="Link" className="inputField" />
+          <button type="submit">Add Song</button>
+        </Form>
+      </Formik>
 
       <h1>Songs for Event</h1>
       {songs.map((song) => (
@@ -98,6 +107,7 @@ function Songs() {
         >
           <h3>{song.title}</h3>
           <p>Artist: {song.artist}</p>
+          <p>Link: {song.link}</p>
         </div>
       ))}
     </div>

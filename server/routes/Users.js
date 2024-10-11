@@ -55,6 +55,18 @@ router.get("/basicinfo/:id", async (req, res) => {
   res.json(basicInfo);
 });
 
+// get all users
+router.get("/allusers", async (req, res) => {
+  try {
+    const users = await Users.findAll({
+      attributes: ["username", "id"], // Only fetch username and id
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
 router.put("/changepassword", validateToken, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const user = await Users.findOne({ where: { username: req.user.username } });

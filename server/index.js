@@ -19,13 +19,13 @@ app.use("/auth", usersRouter);
 const likesRouter = require("./routes/Likes");
 app.use("/likes", likesRouter);
 
-const eventsRouter = require("./routes/events");
+const eventsRouter = require("./routes/Events");
 app.use("/events", eventsRouter);
 
-const songsRouter = require("./routes/songs");
+const songsRouter = require("./routes/Songs");
 app.use("/songs", songsRouter);
 
-const musiciansRouter = require("./routes/musicians");
+const musiciansRouter = require("./routes/Musicians");
 app.use("/musicians", musiciansRouter);
 
 db.sequelize.sync().then(() => {

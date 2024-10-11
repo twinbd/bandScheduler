@@ -8,6 +8,7 @@ function Musicians() {
   const [musicians, setMusicians] = useState([]);
   const [name, setName] = useState("");
   const [instrument, setInstrument] = useState("Guitar");
+  const [users, setUsers] = useState([]); // Store all users
   const { authState } = useContext(AuthContext);
 
   const { state } = useLocation();
@@ -35,9 +36,29 @@ function Musicians() {
     axios.get(`http://localhost:3001/musicians/${songId}`).then((response) => {
       setMusicians(response.data);
     });
+
+    axios.get("http://localhost:3001/auth/allusers").then((response) => {
+      setUsers(response.data);
+    });
   }, [songId]);
 
+  // Check if the selected name exists in the users list
+  const validateName = () => {
+    const userExists = users.some((user) => user.username === name);
+    if (!userExists) {
+      setName(""); // Reset name if invalid
+      // alert("Please select a valid user from the list.");
+    }
+  };
+
   const addMusician = () => {
+    // Ensure a valid user is selected
+    const userExists = users.some((user) => user.username === name);
+    if (!userExists) {
+      alert("Please select a valid user from the dropdown.");
+      return;
+    }
+
     axios
       .post(
         "http://localhost:3001/musicians",
@@ -89,6 +110,9 @@ function Musicians() {
 
   return (
     <div>
+      <button onClick={() => navigate(`/songs/${eventId}`)}>
+        Back to Songs
+      </button>
       <button onClick={() => deleteSong(songId)}> Delete this song</button>
       <h1>Musicians for Song</h1>
 
@@ -96,11 +120,20 @@ function Musicians() {
       <div className="addMusicianContainer">
         <input
           type="text"
-          placeholder="Name..."
+          list="usernames" // Use datalist for dropdown in input
+          placeholder="Search for a user..."
           autoComplete="off"
           value={name}
-          onChange={(event) => setName(event.target.value)} // Handle name input
+          onChange={(event) => setName(event.target.value)} // Handle input change
+          onBlur={validateName} // Validate the name when the user clicks away
         />
+
+        {/* Datalist for user suggestions */}
+        <datalist id="usernames">
+          {users.map((user) => (
+            <option key={user.id} value={user.username} />
+          ))}
+        </datalist>
 
         <select
           value={instrument}
