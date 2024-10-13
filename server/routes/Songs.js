@@ -7,16 +7,24 @@ const { validateToken } = require("../middlewares/AuthMiddleware");
 // Create new song
 router.post("/", validateToken, async (req, res) => {
   try {
-    const { title, artist, link, EventId } = req.body;
-    const newSong = await Songs.create({ title, artist, link, EventId });
+    const { title, artist, link, status, EventId, requesterId } = req.body;
+    const newSong = await Songs.create({
+      title,
+      artist,
+      link,
+      status,
+      EventId,
+      requesterId,
+    });
     res.json(newSong);
   } catch (error) {
     res.status(500).json({ error: "Error creating song" });
   }
 });
 
-// Get all songs for a specific event
+// Get all songs for a specific event, including the username of the requester
 router.get("/:eventId", async (req, res) => {
+  console.log("hi");
   try {
     const eventId = req.params.eventId;
     const songs = await Songs.findAll({ where: { EventId: eventId } });

@@ -11,6 +11,13 @@ function Songs() {
   const { authState } = useContext(AuthContext);
   let navigate = useNavigate();
 
+  const requestedSongs = songs.filter((song) => song.status === 0);
+  const acceptedSongs = songs.filter((song) => song.status === 1);
+  // Check if the user has already requested a song
+  const userRequestedSong = songs.find(
+    (song) => song.requesterId === authState.id
+  );
+
   useEffect(() => {
     axios.get(`http://localhost:3001/songs/${eventId}`).then((response) => {
       setSongs(response.data);
@@ -49,7 +56,9 @@ function Songs() {
           title: data.title,
           artist: data.artist,
           link: data.link,
+          status: authState.admin ? 1 : 0,
           EventId: eventId,
+          requesterId: authState.id,
         },
         {
           headers: {
@@ -72,44 +81,96 @@ function Songs() {
       <button onClick={() => navigate(`/events`)}>Back to Events</button>
       <button onClick={deleteEvent}>Delete this event</button>
 
-      <h1>Add New Song</h1>
-      <Formik
-        initialValues={{ title: "", artist: "", link: "" }} // Initial values
-        onSubmit={onSubmit} // Form submission handler
-        validationSchema={songSchema} // Attach validation schema
-      >
-        <Form className="formContainer">
-          {/* Title input field */}
-          <label>Title: </label>
-          <ErrorMessage name="title" component="span" className="error" />{" "}
-          {/* Error message */}
-          <Field name="title" placeholder="Song Title" className="inputField" />
-          {/* Artist input field */}
-          <label>Artist: </label>
-          <ErrorMessage name="artist" component="span" className="error" />{" "}
-          {/* Error message */}
-          <Field name="artist" placeholder="Artist" className="inputField" />
-          {/* Link input field */}
-          <label>Link: </label>
-          <ErrorMessage name="link" component="span" className="error" />{" "}
-          {/* Error message */}
-          <Field name="link" placeholder="Link" className="inputField" />
-          <button type="submit">Add Song</button>
-        </Form>
-      </Formik>
+      <h1>{authState.admin ? "Add New Song" : "Request New Song"}</h1>
 
-      <h1>Songs for Event</h1>
-      {songs.map((song) => (
-        <div
-          key={song.id}
-          className="song"
-          onClick={() => goToSongDetail(song.id)}
-        >
-          <h3>{song.title}</h3>
-          <p>Artist: {song.artist}</p>
-          <p>Link: {song.link}</p>
+      {/* Only show the form if the user hasn't requested a song yet */}
+      {!authState.admin && userRequestedSong ? (
+        <div className="official-message">
+          <p>
+            You have already requested a Song for this Event!
+            <br />
+            If this was a mistake, please contact the admin
+          </p>
         </div>
-      ))}
+      ) : (
+        <Formik
+          initialValues={{ title: "", artist: "", link: "" }} // Initial values
+          onSubmit={onSubmit} // Form submission handler
+          validationSchema={songSchema} // Attach validation schema
+        >
+          <Form className="formContainer">
+            <label>Title: </label>
+            <ErrorMessage name="title" component="span" className="error" />
+            <Field
+              name="title"
+              placeholder="Song Title"
+              className="inputField"
+            />
+
+            <label>Artist: </label>
+            <ErrorMessage name="artist" component="span" className="error" />
+            <Field name="artist" placeholder="Artist" className="inputField" />
+
+            <label>Link: </label>
+            <ErrorMessage name="link" component="span" className="error" />
+            <Field name="link" placeholder="Link" className="inputField" />
+
+            <button type="submit">
+              {authState.admin ? "Add Song" : "Request Song"}
+            </button>
+          </Form>
+        </Formik>
+      )}
+
+      {/* Flex container for Requested and Accepted songs */}
+      {!!authState.admin && (
+        <div className="songs-container">
+          {/* Requested Songs */}
+          <div className="requested-songs">
+            <h2>Requested Songs:</h2>
+            {requestedSongs.map((song) => (
+              <div key={song.id} className="song">
+                <h3>{song.title}</h3>
+                <p>Artist: {song.artist}</p>
+                <p>Status: Requested</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Accepted Songs */}
+          <div className="accepted-songs">
+            <h2>Accepted Songs:</h2>
+            {acceptedSongs.map((song) => (
+              <div
+                key={song.id}
+                className="song"
+                onClick={() => goToSongDetail(song.id)}
+              >
+                <h3>{song.title}</h3>
+                <p>Artist: {song.artist}</p>
+                <p>Link: {song.link}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Non-admin view: Accepted Songs in the center */}
+      {!authState.admin && (
+        <div className="centered-accepted-songs">
+          <h2>Accepted Songs</h2>
+          {acceptedSongs.map((song) => (
+            <div
+              key={song.id}
+              className="song"
+              onClick={() => goToSongDetail(song.id)}
+            >
+              <h3>{song.title}</h3>
+              <p>Artist: {song.artist}</p>
+              <p>Link: {song.link}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
