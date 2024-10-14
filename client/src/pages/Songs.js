@@ -13,6 +13,7 @@ function Songs() {
 
   const requestedSongs = songs.filter((song) => song.status === 0);
   const acceptedSongs = songs.filter((song) => song.status === 1);
+  const rejectedSongs = songs.filter((song) => song.status === 2);
   // Check if the user has already requested a song
   const userRequestedSong = songs.find(
     (song) => song.requesterId === authState.id
@@ -37,6 +38,18 @@ function Songs() {
       .then(() => {
         navigate("/events");
       });
+  };
+
+  // Delete song function
+  const deleteSong = (songId) => {
+    axios
+      .delete(`http://localhost:3001/songs/${songId}`, {
+        headers: { accessToken: localStorage.getItem("accessToken") },
+      })
+      .then(() => {
+        setSongs(songs.filter((song) => song.id !== songId));
+      })
+      .catch((error) => console.error("Error deleting song:", error));
   };
 
   // Validation schema with Yup for the songs form
@@ -73,6 +86,29 @@ function Songs() {
           setSongs([...songs, response.data]); // Add new song to the list
           resetForm(); // Reset form after submission
         }
+      });
+  };
+
+  // Function to handle song status update (accept/reject)
+  const updateSongStatus = (songId, newStatus) => {
+    axios
+      .put(
+        `http://localhost:3001/songs/status/${songId}`,
+        { status: newStatus },
+        {
+          headers: { accessToken: localStorage.getItem("accessToken") },
+        }
+      )
+      .then((response) => {
+        // Optimistic rendering: update song status in local state
+        setSongs(
+          songs.map((song) =>
+            song.id === songId ? { ...song, status: newStatus } : song
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating song status:", error);
       });
   };
 
@@ -125,6 +161,32 @@ function Songs() {
       {/* Flex container for Requested and Accepted songs */}
       {!!authState.admin && (
         <div className="songs-container">
+          {/* Rejected Songs */}
+          <div className="rejected-songs">
+            <h2>Rejected Songs:</h2>
+            {rejectedSongs.map((song) => (
+              <div key={song.id} className="song">
+                <h3>{song.title}</h3>
+                <p>Artist: {song.artist}</p>
+                <p>
+                  Requested by:{" "}
+                  {song.Requester ? song.Requester.username : "Unknown"}
+                </p>
+                <button
+                  className="accept-button"
+                  onClick={() => updateSongStatus(song.id, 0)}
+                >
+                  Undo
+                </button>
+                <button
+                  className="reject-button"
+                  onClick={() => deleteSong(song.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
           {/* Requested Songs */}
           <div className="requested-songs">
             <h2>Requested Songs:</h2>
@@ -132,7 +194,23 @@ function Songs() {
               <div key={song.id} className="song">
                 <h3>{song.title}</h3>
                 <p>Artist: {song.artist}</p>
-                <p>Status: Requested</p>
+                <p>
+                  Requested by:{" "}
+                  {song.Requester ? song.Requester.username : "Unknown"}
+                </p>
+                {/* Accept and Reject Buttons */}
+                <button
+                  className="accept-button"
+                  onClick={() => updateSongStatus(song.id, 1)}
+                >
+                  Accept
+                </button>
+                <button
+                  className="reject-button"
+                  onClick={() => updateSongStatus(song.id, 2)}
+                >
+                  Reject
+                </button>
               </div>
             ))}
           </div>
@@ -149,6 +227,16 @@ function Songs() {
                 <h3>{song.title}</h3>
                 <p>Artist: {song.artist}</p>
                 <p>Link: {song.link}</p>
+                {/* Undo Button */}
+                <button
+                  className="reject-button"
+                  onClick={(event) => {
+                    event.stopPropagation(); // Prevents triggering goToSongDetail
+                    updateSongStatus(song.id, 0);
+                  }}
+                >
+                  Undo
+                </button>
               </div>
             ))}
           </div>

@@ -27,11 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
     });
 
-    // // Song belongs to one user (the requester)
-    // Songs.belongsTo(models.Users, {
-    //   foreignKey: "requesterId", // requesterId is the foreign key in Songs table
-    //   as: "Requester", // Alias to make it clear this is the user who requested the song
-    // });
+    // Song belongs to one user (the requester)
+    Songs.belongsTo(models.Users, {
+      foreignKey: "requesterId", // requesterId is the foreign key in Songs table
+      as: "Requester", // Alias to make it clear this is the user who requested the song
+    });
   };
 
   return Songs;

@@ -286,6 +286,7 @@ button {
   gap: 20px; /* Adds space between the two columns */
 }
 
+.rejected-songs,
 .requested-songs,
 .accepted-songs {
   flex: 1; /* Makes both columns take equal width */
@@ -305,6 +306,7 @@ button {
   margin-bottom: 10px;
 }
 
+.rejected-songs h2,
 .requested-songs h2,
 .accepted-songs h2 {
   text-align: center;
@@ -336,4 +338,67 @@ button {
 
 .official-message strong {
   font-weight: bold; /* Make the first part bold */
+}
+
+/* Flexbox layout for buttons */
+.button-container {
+  display: flex;
+  justify-content: space-between; /* This ensures buttons are placed side by side */
+  margin-top: 10px;
+}
+
+/* Common styling for both buttons */
+.reject-button,
+.accept-button {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+/* Reject button styling */
+.reject-button {
+  background-color: #ff4d4d; /* Lighter red */
+  color: white;
+}
+
+/* Hover effect for reject button */
+.reject-button:hover {
+  background-color: #ff1a1a; /* Darker red on hover */
+}
+
+/* Accept button styling */
+.accept-button {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+/* Hover effect for accept button */
+.accept-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Song container styling */
+.song {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px; /* Ensures that all boxes have consistent height */
+  position: relative;
+}
+
+/* Song title and content layout */
+.song h3 {
+  margin-top: 0;
+}
+
+/* Ensures the buttons are aligned at the bottom */
+.song .button-container {
+  margin-top: auto;
 }
