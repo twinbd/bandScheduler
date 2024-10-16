@@ -14,6 +14,21 @@ function Musicians() {
   const { state } = useLocation();
   const eventId = state ? state.eventId : null;
 
+  // filter musicians based on status
+  const rejectedMusicians = musicians.filter(
+    (musician) => musician.status === 2
+  );
+  const requestedMusicians = musicians.filter(
+    (musician) => musician.status === 0
+  );
+  const acceptedMusicians = musicians.filter(
+    (musician) => musician.status === 1
+  );
+
+  const pendingRequest = musicians.filter(
+    (musician) => musician.status === 0 && musician.requesterId === authState.id
+  );
+
   let navigate = useNavigate();
 
   // List of available instruments for the dropdown
@@ -40,7 +55,11 @@ function Musicians() {
     axios.get("http://localhost:3001/auth/allusers").then((response) => {
       setUsers(response.data);
     });
-  }, [songId]);
+
+    if (!authState.admin) {
+      setName(authState.username); // Pre-fill with the logged-in user's name
+    }
+  }, [songId, authState]);
 
   // Check if the selected name exists in the users list
   const validateName = () => {
@@ -54,7 +73,7 @@ function Musicians() {
   const addMusician = () => {
     // Ensure a valid user is selected
     const userExists = users.some((user) => user.username === name);
-    if (!userExists) {
+    if (!!authState.admin && !userExists) {
       alert("Please select a valid user from the dropdown.");
       return;
     }
@@ -65,6 +84,8 @@ function Musicians() {
         {
           name: name,
           instrument: instrument,
+          status: !!authState.admin ? 1 : 0,
+          requesterId: authState.id,
           SongId: songId,
         },
         {
@@ -78,9 +99,35 @@ function Musicians() {
           alert(response.data.error);
         } else {
           setMusicians([...musicians, response.data]); // Add new musician to the list
-          setName("");
+          if (!!authState.admin) {
+            setName("");
+          }
           setInstrument("Guitar"); // Reset the dropdown to default
         }
+      });
+  };
+
+  // Function to handle musician status update (accept/reject/undo)
+  const updateMusicianStatus = (musicianId, newStatus) => {
+    axios
+      .put(
+        `http://localhost:3001/musicians/status/${musicianId}`,
+        { status: newStatus },
+        {
+          headers: { accessToken: localStorage.getItem("accessToken") },
+        }
+      )
+      .then((response) => {
+        setMusicians(
+          musicians.map((musician) =>
+            musician.id === musicianId
+              ? { ...musician, status: newStatus }
+              : musician
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating musician status:", error);
       });
   };
 
@@ -121,19 +168,24 @@ function Musicians() {
         <input
           type="text"
           list="usernames" // Use datalist for dropdown in input
-          placeholder="Search for a user..."
+          placeholder={
+            !!authState.admin ? "Search for a user..." : "Your username"
+          }
           autoComplete="off"
           value={name}
           onChange={(event) => setName(event.target.value)} // Handle input change
           onBlur={validateName} // Validate the name when the user clicks away
+          disabled={!authState.admin} // Disable input for non-admins
         />
 
-        {/* Datalist for user suggestions */}
-        <datalist id="usernames">
-          {users.map((user) => (
-            <option key={user.id} value={user.username} />
-          ))}
-        </datalist>
+        {/* Datalist for user suggestions (Only used for admin users) */}
+        {!!authState.admin && (
+          <datalist id="usernames">
+            {users.map((user) => (
+              <option key={user.id} value={user.username} />
+            ))}
+          </datalist>
+        )}
 
         <select
           value={instrument}
@@ -147,16 +199,114 @@ function Musicians() {
           ))}
         </select>
 
-        <button onClick={addMusician}>Add Musician</button>
+        <button onClick={() => addMusician()}>
+          {" "}
+          {!!authState.admin ? "Add Musician" : "Request to Sign Up"}
+        </button>
       </div>
 
-      {musicians.map((musician) => (
-        <div key={musician.id} className="musician">
-          <h4>{musician.name}</h4>
-          <p>Instrument: {musician.instrument}</p>
-          <button onClick={() => deleteMusician(musician.id)}>X</button>
+      {/* Flex container for Rejected, Requested, and Accepted musicians */}
+      {!!authState.admin && (
+        <div className="musicians-container">
+          {/* Rejected Musicians */}
+          <div className="rejected-musicians">
+            <h2>Rejected Musicians:</h2>
+            {rejectedMusicians.map((musician) => (
+              <div key={musician.id} className="musician">
+                <h3>{musician.name}</h3>
+                <p>Instrument: {musician.instrument}</p>
+                <button
+                  className="accept-button"
+                  onClick={() => updateMusicianStatus(musician.id, 0)}
+                >
+                  Undo
+                </button>
+                <button
+                  className="reject-button"
+                  onClick={() => deleteMusician(musician.id)}
+                >
+                  Permanently DELETE
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Requested Musicians */}
+          <div className="requested-musicians">
+            <h2>Requested Musicians:</h2>
+            {requestedMusicians.map((musician) => (
+              <div key={musician.id} className="musician">
+                <h3>{musician.name}</h3>
+                <p>Instrument: {musician.instrument}</p>
+                <button
+                  className="accept-button"
+                  onClick={() => updateMusicianStatus(musician.id, 1)}
+                >
+                  Accept
+                </button>
+                <button
+                  className="reject-button"
+                  onClick={() => updateMusicianStatus(musician.id, 2)}
+                >
+                  Reject
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Accepted Musicians */}
+          <div className="accepted-musicians">
+            <h2>Accepted Musicians:</h2>
+            {acceptedMusicians.map((musician) => (
+              <div key={musician.id} className="musician">
+                <h3>{musician.name}</h3>
+                <p>Instrument: {musician.instrument}</p>
+                <button
+                  className="reject-button"
+                  onClick={() => updateMusicianStatus(musician.id, 0)}
+                >
+                  Undo
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
+
+      {/* Non-admin View */}
+      {!authState.admin && (
+        <div className="musicians-container">
+          {/* Pending Request */}
+          {pendingRequest.length > 0 && (
+            <div className="pending-request">
+              <h2>Your Pending Requests:</h2>
+              <p
+                style={{ fontSize: "12px", fontStyle: "italic", color: "#555" }}
+              >
+                If your request doesn't show up here anymore, it has been either
+                accepted or rejected.
+              </p>
+              {pendingRequest.map((musician) => (
+                <div key={musician.id} className="musician">
+                  <h4>{musician.name}</h4>
+                  <p>Instrument: {musician.instrument}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Accepted Musicians */}
+          <div className="accepted-musicians">
+            <h2>Accepted Musicians:</h2>
+            {acceptedMusicians.map((musician) => (
+              <div key={musician.id} className="musician">
+                <h4>{musician.name}</h4>
+                <p>Instrument: {musician.instrument}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -402,3 +402,80 @@ button {
 .song .button-container {
   margin-top: auto;
 }
+
+/* Musicians container layout */
+.musicians-container {
+  display: flex;
+  justify-content: space-between; /* Aligns the columns at the ends */
+  gap: 20px; /* Adds space between the columns */
+}
+
+.rejected-musicians,
+.requested-musicians,
+.accepted-musicians {
+  flex: 1; /* Makes all columns take equal width */
+  max-width: 32%; /* Ensures each section doesn't exceed one-third of the screen width */
+}
+
+.rejected-musicians h2,
+.requested-musicians h2,
+.accepted-musicians h2 {
+  text-align: center;
+}
+
+/* Musician card style */
+.musician {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  position: relative;
+}
+
+.musician h3 {
+  margin-top: 0;
+}
+
+/* Flexbox layout for buttons */
+.musician .button-container {
+  display: flex;
+  justify-content: space-between; /* Aligns the buttons side by side */
+  margin-top: 10px;
+}
+
+/* Ensure all musician cards are consistent in height */
+.musician {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px; /* Ensures that all boxes have consistent height */
+  position: relative;
+}
+
+/* Pending request card styling for non-admin view */
+.pending-request {
+  flex: 1;
+  max-width: 32%;
+}
+
+.pending-request h2 {
+  text-align: center;
+}
+
+.pending-request .musician {
+  background-color: #fff3e0; /* Light orange background for pending request */
+  border: 1px solid #ff9800; /* Orange border */
+}
+
+/* Align buttons at the bottom of the card */
+.musician .button-container {
+  margin-top: auto;
+}

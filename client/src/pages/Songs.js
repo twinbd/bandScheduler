@@ -125,8 +125,20 @@ function Songs() {
           <p>
             You have already requested a Song for this Event!
             <br />
-            If this was a mistake, please contact the admin
+            If this was a mistake, please contact the admin.
+            <br />
+            <br />
+            NOTE: If you don't see "Your pending request" below,
+            <br />
+            your reqested song has been either accepted or rejected.
+            <br />
+            <br />
           </p>
+          {userRequestedSong.status === 0 && (
+            <p style={{ marginTop: "10px" }}>
+              <strong>Your pending request:</strong> {userRequestedSong.title}
+            </p>
+          )}
         </div>
       ) : (
         <Formik
@@ -182,7 +194,7 @@ function Songs() {
                   className="reject-button"
                   onClick={() => deleteSong(song.id)}
                 >
-                  Delete
+                  Permanently DELETE
                 </button>
               </div>
             ))}
