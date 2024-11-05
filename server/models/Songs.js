@@ -1,3 +1,5 @@
+const moment = require("moment-timezone");
+
 module.exports = (sequelize, DataTypes) => {
   const Songs = sequelize.define("Songs", {
     title: {
@@ -19,6 +21,18 @@ module.exports = (sequelize, DataTypes) => {
     requesterId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      get() {
+        const rawValue = this.getDataValue("createdAt");
+        return moment
+          .tz(rawValue, "America/Los_Angeles")
+          .format("YYYY-MM-DD HH:mm:ss");
+      },
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
     },
   });
 

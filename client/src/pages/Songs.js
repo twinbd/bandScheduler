@@ -83,6 +83,7 @@ function Songs() {
         if (response.data.error) {
           alert(response.data.error);
         } else {
+          response.data.Requester = { username: authState.username };
           setSongs([...songs, response.data]); // Add new song to the list
           resetForm(); // Reset form after submission
         }
@@ -210,6 +211,8 @@ function Songs() {
                   Requested by:{" "}
                   {song.Requester ? song.Requester.username : "Unknown"}
                 </p>
+                <p>Requested at: {song.createdAt}</p>{" "}
+                {/* Display createdAt here */}
                 {/* Accept and Reject Buttons */}
                 <button
                   className="accept-button"
