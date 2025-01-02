@@ -20,7 +20,7 @@ function Songs() {
   );
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/songs/${eventId}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/songs/${eventId}`).then((response) => {
       setSongs(response.data);
     });
   }, [eventId]);
@@ -32,7 +32,7 @@ function Songs() {
 
   const deleteEvent = (id) => {
     axios
-      .delete(`http://localhost:3001/events/${eventId}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/events/${eventId}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {
@@ -43,7 +43,7 @@ function Songs() {
   // Delete song function
   const deleteSong = (songId) => {
     axios
-      .delete(`http://localhost:3001/songs/${songId}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/songs/${songId}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {
@@ -64,7 +64,7 @@ function Songs() {
   const onSubmit = (data, { resetForm }) => {
     axios
       .post(
-        "http://localhost:3001/songs",
+        `${process.env.REACT_APP_API_BASE_URL}/songs`,
         {
           title: data.title,
           artist: data.artist,
@@ -94,7 +94,7 @@ function Songs() {
   const updateSongStatus = (songId, newStatus) => {
     axios
       .put(
-        `http://localhost:3001/songs/status/${songId}`,
+        `${process.env.REACT_APP_API_BASE_URL}/songs/status/${songId}`,
         { status: newStatus },
         {
           headers: { accessToken: localStorage.getItem("accessToken") },

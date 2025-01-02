@@ -48,11 +48,11 @@ function Musicians() {
 
   useEffect(() => {
     console.log(songId); //  This is printing undefined
-    axios.get(`http://localhost:3001/musicians/${songId}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/musicians/${songId}`).then((response) => {
       setMusicians(response.data);
     });
 
-    axios.get("http://localhost:3001/auth/allusers").then((response) => {
+    axios.get("${process.env.REACT_APP_API_BASE_URL}/auth/allusers").then((response) => {
       setUsers(response.data);
     });
 
@@ -80,7 +80,7 @@ function Musicians() {
 
     axios
       .post(
-        "http://localhost:3001/musicians",
+        `${process.env.REACT_APP_API_BASE_URL}/musicians`,
         {
           name: name,
           instrument: instrument,
@@ -111,7 +111,7 @@ function Musicians() {
   const updateMusicianStatus = (musicianId, newStatus) => {
     axios
       .put(
-        `http://localhost:3001/musicians/status/${musicianId}`,
+        `${process.env.REACT_APP_API_BASE_URL}/musicians/status/${musicianId}`,
         { status: newStatus },
         {
           headers: { accessToken: localStorage.getItem("accessToken") },
@@ -133,7 +133,7 @@ function Musicians() {
 
   const deleteMusician = (id) => {
     axios
-      .delete(`http://localhost:3001/musicians/${id}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/musicians/${id}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {
@@ -147,7 +147,7 @@ function Musicians() {
 
   const deleteSong = () => {
     axios
-      .delete(`http://localhost:3001/songs/${songId}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/songs/${songId}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {

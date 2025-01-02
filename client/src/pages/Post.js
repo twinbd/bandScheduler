@@ -13,11 +13,11 @@ function Post() {
   let nagivate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/posts/byId/${id}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/posts/byId/${id}`).then((response) => {
       setPostObject(response.data);
     });
 
-    axios.get(`http://localhost:3001/comments/${id}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/comments/${id}`).then((response) => {
       setComments(response.data);
     });
   }, []);
@@ -25,7 +25,7 @@ function Post() {
   const addComment = () => {
     axios
       .post(
-        "http://localhost:3001/comments",
+        `${process.env.REACT_APP_API_BASE_URL}/comments`,
         {
           commentBody: newComment,
           PostId: id,
@@ -52,7 +52,7 @@ function Post() {
 
   const deleteComment = (id) => {
     axios
-      .delete(`http://localhost:3001/comments/${id}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/comments/${id}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {
@@ -66,7 +66,7 @@ function Post() {
 
   const deletePost = (id) => {
     axios
-      .delete(`http://localhost:3001/posts/${id}`, {
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/posts/${id}`, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then(() => {
@@ -78,7 +78,7 @@ function Post() {
     if (option === "title") {
       let newTitle = prompt("Enter New Title");
       axios.put(
-        "http://localhost:3001/posts/title",
+        `${process.env.REACT_APP_API_BASE_URL}/posts/title`,
         {
           newTitle: newTitle,
           id: id,
@@ -90,7 +90,7 @@ function Post() {
     } else {
       let newPostText = prompt("Enter New Post text");
       axios.put(
-        "http://localhost:3001/posts/postText",
+        `${process.env.REACT_APP_API_BASE_URL}/posts/postText`,
         {
           newText: newPostText,
           id: id,

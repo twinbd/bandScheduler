@@ -16,7 +16,7 @@ function Home() {
       navigate("/login");
     } else {
       axios
-        .get("http://localhost:3001/posts", {
+        .get(`${process.env.REACT_APP_API_BASE_URL}/posts`, {
           headers: { accessToken: localStorage.getItem("accessToken") },
         })
         .then((response) => {
@@ -46,7 +46,7 @@ function Home() {
   const likeAPost = (postId) => {
     axios
       .post(
-        "http://localhost:3001/likes",
+        `${process.env.REACT_APP_API_BASE_URL}/likes`,
         { PostId: postId },
         { headers: { accessToken: localStorage.getItem("accessToken") } }
       )
