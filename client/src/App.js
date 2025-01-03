@@ -18,6 +18,11 @@ import { AuthContext } from "./helpers/AuthContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+  console.error = () => {};
+}
+
 function App() {
   const [authState, setAuthState] = useState({
     username: "",
