@@ -14,7 +14,7 @@ function Events() {
   let navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://localhost:3001/events").then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/events`).then((response) => {
       setEvents(response.data);
     });
   }, []);
@@ -35,7 +35,7 @@ function Events() {
   const onSubmit = (data, { resetForm }) => {
     axios
       .post(
-        "http://localhost:3001/events",
+        `${process.env.REACT_APP_API_BASE_URL}/events`,
         {
           title: data.title,
           year: parseInt(data.year),

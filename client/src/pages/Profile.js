@@ -11,11 +11,11 @@ function Profile() {
   const { authState } = useContext(AuthContext);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/auth/basicinfo/${id}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/auth/basicinfo/${id}`).then((response) => {
       setUsername(response.data.username);
     });
 
-    axios.get(`http://localhost:3001/posts/byuserId/${id}`).then((response) => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/posts/byuserId/${id}`).then((response) => {
       setListOfPosts(response.data);
     });
   }, []);

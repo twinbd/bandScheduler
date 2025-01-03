@@ -18,6 +18,11 @@ import { AuthContext } from "./helpers/AuthContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+  console.error = () => {};
+}
+
 function App() {
   const [authState, setAuthState] = useState({
     username: "",
@@ -28,7 +33,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/auth/auth", {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/auth/auth`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

@@ -8,7 +8,7 @@ function ChangePassword() {
   const changePassword = () => {
     axios
       .put(
-        "http://localhost:3001/auth/changepassword",
+        `${process.env.REACT_APP_API_BASE_URL}/auth/changepassword`,
         {
           oldPassword: oldPassword,
           newPassword: newPassword,

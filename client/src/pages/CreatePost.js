@@ -27,7 +27,7 @@ function CreatePost() {
 
   const onSubmit = (data) => {
     axios
-      .post("http://localhost:3001/posts", data, {
+      .post(`${process.env.REACT_APP_API_BASE_URL}/posts`, data, {
         headers: { accessToken: localStorage.getItem("accessToken") },
       })
       .then((response) => {
