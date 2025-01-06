@@ -13,6 +13,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 0,
     },
+    login_token: {
+      type: DataTypes.STRING,
+      allowNull: true, // Allows null when not in use
+    },
+    token_expiry: {
+      type: DataTypes.DATE,
+      allowNull: true, // Allows null when not in use
+    },
+    last_login_at: {
+      type: DataTypes.DATE,
+      allowNull: true, // Allows null if the user hasn't logged in yet
+    },
   });
 
   Users.associate = (models) => {

@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
+require("dotenv").config();
+
 app.use(express.json());
 app.use(cors());
 const db = require("./models");
@@ -27,6 +29,9 @@ app.use("/songs", songsRouter);
 
 const musiciansRouter = require("./routes/Musicians");
 app.use("/musicians", musiciansRouter);
+
+const signupsRouter = require("./routes/Signups");
+app.use("/signups", signupsRouter);
 
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {
