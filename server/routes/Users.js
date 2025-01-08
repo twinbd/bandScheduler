@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { validateToken } = require("../middlewares/AuthMiddleware");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const { Op } = require("sequelize");
 
 const { sign } = require("jsonwebtoken");
 
@@ -140,6 +141,94 @@ router.post("/loginpl", async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while processing the login." });
+  }
+});
+
+router.get("/verify-token", async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({ message: "Token is required." });
+  }
+
+  try {
+    // Find the user with the matching token and ensure it's not expired
+    const user = await Users.findOne({
+      where: {
+        login_token: token,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    if (new Date() > user.token_expiry) {
+      return res.status(400).json({ message: "Token has expired." });
+    }
+
+    // Clear the token after successful login
+    await user.update({ login_token: null, token_expiry: null });
+
+    // Generate an access token for the user (e.g., JWT)
+    const accessToken = sign(
+      { username: user.username, id: user.id, admin: user.admin },
+      "importantsecret"
+    );
+
+    // Respond with the access token
+    res.status(200).json({
+      message: "Login successful",
+      token: accessToken,
+      username: user.username,
+      id: user.id,
+      admin: user.admin,
+    });
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while verifying the token." });
+  }
+});
+
+// Fetch users by role (user/admin)
+router.get("/members", validateToken, async (req, res) => {
+  const { role } = req.query; // Role passed as query parameter ("user" or "admin")
+
+  try {
+    const isAdmin = role === "admin" ? 1 : 0; // Convert role to admin flag
+    const members = await Users.findAll({
+      where: { admin: isAdmin },
+      attributes: ["id", "username"], // Fetch only id and username
+    });
+
+    res.status(200).json(members);
+  } catch (error) {
+    console.error("Error fetching members:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching members." });
+  }
+});
+
+// Delete user by ID
+router.delete("/members/:id", validateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    await user.destroy();
+    res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the user." });
   }
 });
 

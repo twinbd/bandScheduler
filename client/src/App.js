@@ -11,6 +11,10 @@ import ChangePassword from "./pages/ChangePassword";
 import Events from "./pages/Events";
 import Songs from "./pages/Songs";
 import Musicians from "./pages/Musicians";
+import VerifyToken from "./pages/VerifyToken";
+import Loginpl from "./pages/Loginpl";
+import Registrationpl from "./pages/Registrationpl";
+import Members from "./pages/Members";
 
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +22,7 @@ import { AuthContext } from "./helpers/AuthContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   console.log = () => {};
   console.error = () => {};
 }
@@ -89,12 +93,15 @@ function MainContent({ authState, setAuthState }) {
             <>
               <Link to="/login"> Login</Link>
               <Link to="/registration"> Registration</Link>
+              <Link to="/loginpl"> Loginpl</Link>
+              <Link to="/registrationpl"> Registrationpl</Link>
             </>
           ) : (
             <>
               <Link to="/"> Home Page</Link>
               <Link to="/createpost"> Create A Post</Link>
               <Link to="/events"> Events</Link>
+              {!!authState.admin && <Link to="/members"> Members</Link>}
             </>
           )}
         </div>
@@ -122,6 +129,10 @@ function MainContent({ authState, setAuthState }) {
         <Route path="/events" element={<Events />} />
         <Route path="/songs/:eventId" element={<Songs />} />
         <Route path="/musicians/:songId" element={<Musicians />} />
+        <Route path="/verify-token" element={<VerifyToken />} />
+        <Route path="/loginpl" element={<Loginpl />} />
+        <Route path="/registrationpl" element={<Registrationpl />} />
+        <Route path="/members" element={<Members />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
