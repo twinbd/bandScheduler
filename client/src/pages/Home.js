@@ -79,39 +79,41 @@ function Home() {
       });
   };
   return (
-    <div>
-      {listOfPosts.map((value, key) => {
-        return (
-          <div key={key} className="post">
-            <div className="title">{value.title}</div>
-            <div
-              className="body"
-              onClick={() => {
-                navigate(`/post/${value.id}`);
-              }}
-            >
-              {value.postText}
-            </div>
-            <div className="footer">
-              <div className="username">
-                <Link to={`/profile/${value.UserId}`}> {value.username}</Link>{" "}
+    <div className="content">
+      <div>
+        {listOfPosts.map((value, key) => {
+          return (
+            <div key={key} className="post">
+              <div className="title">{value.title}</div>
+              <div
+                className="body"
+                onClick={() => {
+                  navigate(`/post/${value.id}`);
+                }}
+              >
+                {value.postText}
               </div>
-              <div className="buttons"></div>
-              <div>
-                <ThumbUpAltIcon
-                  onClick={() => {
-                    likeAPost(value.id);
-                  }}
-                  className={
-                    likedPosts.includes(value.id) ? "unlikePost" : "likeBttn"
-                  }
-                />
-                <label>{value.Likes.length}</label>
+              <div className="footer">
+                <div className="username">
+                  <Link to={`/profile/${value.UserId}`}> {value.username}</Link>{" "}
+                </div>
+                <div className="buttons"></div>
+                <div>
+                  <ThumbUpAltIcon
+                    onClick={() => {
+                      likeAPost(value.id);
+                    }}
+                    className={
+                      likedPosts.includes(value.id) ? "unlikePost" : "likeBttn"
+                    }
+                  />
+                  <label>{value.Likes.length}</label>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

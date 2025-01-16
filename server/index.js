@@ -33,6 +33,9 @@ app.use("/musicians", musiciansRouter);
 const signupsRouter = require("./routes/Signups");
 app.use("/signups", signupsRouter);
 
+const constraintsRouter = require("./routes/Constraints");
+app.use("/constraints", constraintsRouter);
+
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {
     console.log("Server running on port 3001");
