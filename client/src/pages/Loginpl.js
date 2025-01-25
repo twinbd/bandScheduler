@@ -15,6 +15,7 @@ function Loginpl() {
   });
 
   const onSubmit = (data, { resetForm }) => {
+    data.baseUrl = process.env.REACT_APP_API_BASE_URL;
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/auth/loginpl`, data)
       .then((response) => {

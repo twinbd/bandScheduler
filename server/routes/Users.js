@@ -90,7 +90,7 @@ router.put("/changepassword", validateToken, async (req, res) => {
 });
 
 router.post("/loginpl", async (req, res) => {
-  const { email } = req.body;
+  const { email, baseUrl } = req.body;
 
   if (!email) {
     return res.status(400).json({ message: "Email is required." });
@@ -124,7 +124,7 @@ router.post("/loginpl", async (req, res) => {
     });
 
     // Construct login link
-    const loginLink = `http://localhost:3000/verify-token?token=${token}`;
+    const loginLink = `${baseUrl}/verify-token?token=${token}`;
 
     // Send email with login link
     await transporter.sendMail({
