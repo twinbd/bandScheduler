@@ -3,8 +3,8 @@ const router = express.Router();
 const { Users } = require("../models");
 const bcrypt = require("bcrypt");
 const { validateToken } = require("../middlewares/AuthMiddleware");
+const sendMail = require("../utils/sendMail")
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const { Op } = require("sequelize");
 
 const { sign } = require("jsonwebtoken");
@@ -111,24 +111,11 @@ router.post("/loginpl", async (req, res) => {
     // Update user with token and expiry
     await user.update({ login_token: token, token_expiry: expiry });
 
-    // Configure Nodemailer with Amazon SES
-    console.log(process.env.AWS_SES_REGION);
-    const transporter = nodemailer.createTransport({
-      host: process.env.AWS_SES_REGION, // SES SMTP endpoint
-      port: 587, // TLS port
-      secure: false, // Use STARTTLS
-      auth: {
-        user: process.env.AWS_SES_SMTP_USER, // SES SMTP username
-        pass: process.env.AWS_SES_SMTP_PASS, // SES SMTP password
-      },
-    });
-
     // Construct login link
     const loginLink = `${baseUrl}/verify-token?token=${token}`;
 
     // Send email with login link
-    await transporter.sendMail({
-      from: `"Band Scheduler" <no-reply@band-schedule.com>`, // Use a verified sender email
+    await sendMail({
       to: email, // Recipient email
       subject: "Your Login Link",
       text: `Click here to log in: ${loginLink}`, // Plain text version

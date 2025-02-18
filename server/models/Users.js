@@ -8,6 +8,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     admin: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -24,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
     last_login_at: {
       type: DataTypes.DATE,
       allowNull: true, // Allows null if the user hasn't logged in yet
+    },
+    intro: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   });
 
